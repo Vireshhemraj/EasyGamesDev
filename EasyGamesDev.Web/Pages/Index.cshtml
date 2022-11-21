@@ -69,6 +69,10 @@
                         <i class="fa fa-info-circle"></i> Transaction Information
                     </div>
                     <div class="card-body">
+                        <div class="form-group row">
+                            <div class="col-md-2"><label class="col-form-label font-weight-bold"> Filter:</label></div>
+                            <div class="col-md-6"> <input type="text" v-model="filterText" class="form-control"></div>
+                        </div>
                         <div id="table">
                             <div v-if="transactionList.length === 0" class="row">
                                 <div class="col-md-12 alert alert-info" role="alert">No Transactions</div>
@@ -231,6 +235,6 @@
 </div>
 
 @section Scripts {
-  @*  wwwroot>js*@
+  @*wwwroot>js*@
     <script src="~/js/Clients.js"></script>
 }

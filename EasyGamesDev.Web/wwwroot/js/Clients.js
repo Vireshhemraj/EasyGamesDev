@@ -16,7 +16,9 @@ new Vue({
         updateTransactionInfoById: '',
         updateTransactionErrorMessage: '',
         currentSortColumn: 'name',
-        currentSortDirection: 'asc'
+        currentSortDirection: 'asc',
+        filterText: '',
+        orignalTransactionList:''
     },
 
     created() {
@@ -114,7 +116,6 @@ new Vue({
                     setTimeout(function () {
                         if (_this.selectedClient.id > -1) {
                             let selectedClient = _this.clientList.find(s => s.clientID === _this.selectedClient.id);
-                            console.log(selectedClient)
                             _this.selectedClient = {
                                 id: selectedClient.clientID, label: selectedClient.name + ' ' + selectedClient.surname + ' (' + selectedClient.clientBalance + ')'
                             };
@@ -137,6 +138,7 @@ new Vue({
             }
             window.axios.get(url).then(function (response) {
                 _this.transactionList = response.data;
+                _this.orignalTransactionList = response.data;
             }).catch(function (error) {
                 this.errorMessage = error;
             });
@@ -186,6 +188,19 @@ new Vue({
     },
 
     watch: {
+        filterText() {
+            let filterText = this.filterText.toString();
+            let list = [];
+            let _this = this;
+            _this.orignalTransactionList.forEach((element, index, array) => {
+                if (element.amount.toString().includes(filterText)) list.push( element );
+                else if (element.name.toLowerCase().includes(filterText.toLowerCase())) list.push( element );
+                else if (element.surname.toLowerCase().includes(filterText.toLowerCase())) list.push( element );
+                else if (element.transactionTypeName.toLowerCase().includes(filterText.toLowerCase())) list.push( element );
+            });
+           this.transactionList = list;
+        },
+
         selectedClient() {
             this.getTransactionList();
             this.getClientByClientID();
