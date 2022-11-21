@@ -1,0 +1,236 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Client Information";
+}
+
+
+<div id="clients" v-cloak>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="container-fluid px-0">
+                <div class="card border-default mb-3">
+                    <div class="card-header border-default mb-3">
+                        <i class="fa fa-info-circle"></i> Client Information
+                    </div>
+                    <div class="card-body">
+                        <div v-if="errorMessage.length">
+                            <div class="alert alert-danger" role="alert">
+                                {{errorMessage}}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-2">
+                                <label class="control-label font-weight-bold pt-1">Select Client</label>
+                            </div>
+                            <div class="col-md-6">
+                                <v-select id="ddlClient" :clearable="false" placeholder="Select Client" v-model="selectedClient" :options="dllClientList" item-value="options.id" item-text="options.label">
+                                </v-select>
+                            </div>
+                            <div class="col-md-2 align-middle" v-if="selectedClient.id > -1">
+                                <button type="button" class="btn btn-sm btn-primary" id="btnAddTransaction" name="Add Transaction" v-on:click="showAddTransactionModal"><i class="fas fa-plus-circle"></i> Add Transaction </button>
+                            </div>
+                        </div>
+
+                        <div v-if="selectedClient.id > -1">
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    <label class="control-label font-weight-bold">Name</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <label>{{clientInfoByClientId.name}}</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    <label class="control-label font-weight-bold">Surname</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <label>{{clientInfoByClientId.surname}}</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    <label class="control-label font-weight-bold">Balance</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <label>{{clientInfoByClientId.clientBalance}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-default mb-3">
+                    <div class="card-header border-default mb-3">
+                        <i class="fa fa-info-circle"></i> Transaction Information
+                    </div>
+                    <div class="card-body">
+                        <div id="table">
+                            <div v-if="transactionList.length === 0" class="row">
+                                <div class="col-md-12 alert alert-info" role="alert">No Transactions</div>
+                            </div>
+                            <div v-else class="table table-hover">
+                                <div id="tr" class="row">
+                                    <div class="col-md-2 pl-2"><strong>Name</strong></div>
+                                    <div class="col-md-2 pl-2"><strong>Surname</strong></div>
+                                    <div class="col-md-2 pl-2"><strong>Transaction Type</strong></div>
+                                    <div class="col-md-2 pl-2"><strong>Amount</strong></div>
+                                    <div class="col-md-3 pl-2"><strong>Comment</strong></div>
+                                    <div class="col-md-1"><strong></strong></div>
+                                </div>
+                                <div v-for="transaction in transactionList" class="row">
+                                    <div class="col-md-2">{{transaction.name}}</div>
+                                    <div class="col-md-2">{{transaction.surname}}</div>
+                                    <div class="col-md-2">
+                                        <span v-if="transaction.transactionTypeID === 1">
+                                            <span class="badge badge-success">{{transaction.transactionTypeName}}</span>
+                                        </span>
+                                        <span v-else>
+                                            <span class="badge badge-secondary">{{transaction.transactionTypeName}}</span>
+                                        </span>
+
+                                    </div>
+                                    <div class="col-md-2">{{transaction.amount}}</div>
+                                    <div class="col-md-3">{{transaction.comment}}</div>
+                                    <div class="col-md-1"> <i class="fa fa-edit" v-on:click="showUpdateTransactionModal(transaction.transactionID)"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    @*Modal Add Transaction*@
+    <div class="modal fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="transactionModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transactionModalTitle">Add Transaction</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="closeTransactionModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row" v-if="saveTransactionErrorMessage.length">
+                            <div class="col-md-12 alert alert-danger" role="alert">{{saveTransactionErrorMessage}}</div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3"><label class="col-form-label font-weight-bold"> Name:</label></div>
+                            <div class="col-md-9"><label class="col-form-label">{{clientInfoByClientId.name}}</label> </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-3"><label class="col-form-label font-weight-bold"> Surname:</label></div>
+                            <div class="col-md-9"><label class="col-form-label">{{clientInfoByClientId.surname}}</label></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3"><label class="col-form-label font-weight-bold"> Balance:</label></div>
+                            <div class="col-md-9"><label class="col-form-label">{{clientInfoByClientId.clientBalance}}</label></div>
+                        </div>
+                        <hr />
+
+                        <div class="form-group row">
+                            <div class="col-md-3"><label for="transactionAmount" class="col-form-label font-weight-bold"> Amount:</label></div>
+                            <div class="col-md-9">
+                                <input type="number" min="0" placeholder="Enter Amount" class="form-control" v-model="saveTransactionInfo.amount" id="transactionAmount" :class="{'input-error-border' : amountErrorMessage.length > 0}">
+                                <span v-if="amountErrorMessage.length" class="text-danger">{{amountErrorMessage}}</span>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3"><label for="transactionType" class="col-form-label font-weight-bold"> Transaction Type:</label></div>
+                            <div class="col-md-9">
+                                <div class="row pt-2">
+                                    <div class="col-md-6">
+                                        <input type="radio" id="debit" name="transactionType" value="1" v-model="saveTransactionInfo.transactionType">
+                                        <label for="debit">Debit</label><br>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="radio" id="credit" name="transactionType" value="2" v-model="saveTransactionInfo.transactionType">
+                                        <label for="credit">Credit</label><br>
+                                    </div>
+                                </div>
+                                <span v-if="transactionTypeErrorMessage.length" class="text-danger">{{transactionTypeErrorMessage}}</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-3"><label for="transactionComment" class="col-form-label  font-weight-bold"> Comment:</label></div>
+                            <div class="col-md-9"> <textarea maxlength="100" placeholder="Enter Comment" class="form-control" id="transactionComment" v-model="saveTransactionInfo.comment"></textarea></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnClose" v-on:click="closeTransactionModal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnSave" v-on:click="saveTransactionModal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*Modal Add End*@
+
+    @*Modal Update Transaction*@
+    <div class="modal fade" id="transactionUpdateModal" tabindex="-1" role="dialog" aria-labelledby="transactionUpdateModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transactionUpdateModalTitle">Update Transaction</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="closeUpdateTransactionModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row" v-if="updateTransactionErrorMessage.length">
+                            <div class="col-md-12 alert alert-danger" role="alert">{{updateTransactionErrorMessage}}</div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3"><label class="col-form-label font-weight-bold"> Name:</label></div>
+                            <div class="col-md-9"><label class="col-form-label">{{updateTransactionInfoById.name}}</label> </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-3"><label class="col-form-label font-weight-bold"> Surname:</label></div>
+                            <div class="col-md-9"><label class="col-form-label">{{updateTransactionInfoById.surname}}</label></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3"><label class="col-form-label font-weight-bold"> Balance:</label></div>
+                            <div class="col-md-9"><label class="col-form-label">{{updateTransactionInfoById.clientBalance}}</label></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3"><label class="col-form-label font-weight-bold"> Transaction Type:</label></div>
+                            <div class="col-md-9"><label class="col-form-label">{{updateTransactionInfoById.transactionTypeName}}</label></div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3"><label class="col-form-label font-weight-bold"> Amount:</label></div>
+                            <div class="col-md-9"><label class ="col-form-label">{{updateTransactionInfoById.amount}}</label></div>
+                        </div>
+                        <hr />
+                        <div class="form-group row">
+                            <div class="col-md-3"><label for="comment" class="col-form-label font-weight-bold"> Comment:</label></div>
+                            <div class="col-md-9"> <textarea maxlength="100" placeholder="Enter Comment" class="form-control" id="comment" v-model="updateTransactionInfoById.comment"></textarea></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnClose" v-on:click="closeUpdateTransactionModal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnSave" v-on:click="saveUpdateTransactionModal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*Modal Update End*@
+</div>
+
+@section Scripts {
+  @*  wwwroot>js*@
+    <script src="~/js/Clients.js"></script>
+}

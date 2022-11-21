@@ -1,0 +1,26 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/*custom class styles*/
+#btnAddTransaction {margin-top: 0.1rem}
+#menuItemClient {margin-top: 0.1rem}
+.input-error-border {border-color: red !important;}
+[v-cloak] {
+    display: none;
+}
