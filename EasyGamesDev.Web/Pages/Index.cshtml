@@ -75,14 +75,14 @@
                             </div>
                             <div v-else class="table table-hover">
                                 <div id="tr" class="row">
-                                    <div class="col-md-2 pl-2"><strong>Name</strong></div>
-                                    <div class="col-md-2 pl-2"><strong>Surname</strong></div>
-                                    <div class="col-md-2 pl-2"><strong>Transaction Type</strong></div>
-                                    <div class="col-md-2 pl-2"><strong>Amount</strong></div>
-                                    <div class="col-md-3 pl-2"><strong>Comment</strong></div>
+                                    <div class="col-md-2 pl-2" v-on:click="sortTransactionByColumnAscDesc('name')"><strong><i :class="getUpDownArrow('name')"></i> Name</strong></div>
+                                    <div class="col-md-2 pl-2" v-on:click="sortTransactionByColumnAscDesc('surname')"><strong><i :class="getUpDownArrow('surname')"></i> Surname</strong></div>
+                                    <div class="col-md-2 pl-2" v-on:click="sortTransactionByColumnAscDesc('transactionTypeName')"><strong><i :class="getUpDownArrow('transactionTypeName')"></i> Type</strong></div>
+                                    <div class="col-md-2 pl-2" v-on:click="sortTransactionByColumnAscDesc('amount')"><strong><i :class="getUpDownArrow('amount')"></i> Amount</strong></div>
+                                    <div class="col-md-3 pl-2"  ><strong>Comment</strong></div>
                                     <div class="col-md-1"><strong></strong></div>
                                 </div>
-                                <div v-for="transaction in transactionList" class="row">
+                                <div v-for="transaction in sortTransactionList" class="row">
                                     <div class="col-md-2">{{transaction.name}}</div>
                                     <div class="col-md-2">{{transaction.surname}}</div>
                                     <div class="col-md-2">

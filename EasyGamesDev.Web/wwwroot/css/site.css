@@ -24,3 +24,6 @@ body {
 [v-cloak] {
     display: none;
 }
+.fas{
+    display:initial!important;
+}

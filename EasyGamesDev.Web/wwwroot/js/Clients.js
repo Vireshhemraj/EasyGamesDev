@@ -14,7 +14,9 @@ new Vue({
         transactionTypeErrorMessage: '',
         saveTransactionErrorMessage: '',
         updateTransactionInfoById: '',
-        updateTransactionErrorMessage: ''
+        updateTransactionErrorMessage: '',
+        currentSortColumn: 'name',
+        currentSortDirection: 'asc'
     },
 
     created() {
@@ -22,7 +24,40 @@ new Vue({
         this.getTransactionList();
     },
 
+    computed: {
+        sortTransactionList() {
+            return this.transactionList.sort((a, b) => {
+                let modifier = 1;
+                if (this.currentSortDirection === 'desc') modifier = -1;
+                if (this.currentSortColumn === 'transactionTypeName') {
+                    if (a[this.currentSortColumn] !== undefined) {
+                        if ((a[this.currentSortColumn]).toLowerCase() < (b[this.currentSortColumn]).toLowerCase())
+                            return -1 * modifier;
+                        if ((a[this.currentSortColumn]).toLowerCase() > (b[this.currentSortColumn]).toLowerCase())
+                            return 1 * modifier;
+                        return 0;
+                    }
+                } else {
+                    if (a[this.currentSortColumn] !== undefined) {
+                        if ((a[this.currentSortColumn.toLowerCase()]) < (b[this.currentSortColumn.toLowerCase()]))
+                            return -1 * modifier;
+                        if ((a[this.currentSortColumn.toLowerCase()]) > (b[this.currentSortColumn.toLowerCase()]))
+                            return 1 * modifier;
+                        return 0;
+                    }
+                }
+                return 0;
+            });
+        },
+    },
+
     methods: {
+        getUpDownArrow(currentSortColumn) {
+            if (this.currentSortColumn === currentSortColumn) {
+                return this.currentSortDirection === 'asc' ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+            }
+        },
+
         getClientList() {
             let _this = this;
             window.axios.get("api/Client/GetAllClients")
@@ -84,7 +119,7 @@ new Vue({
                                 id: selectedClient.clientID, label: selectedClient.name + ' ' + selectedClient.surname + ' (' + selectedClient.clientBalance + ')'
                             };
                         }
-                    }, 500);                   
+                    }, 500);
                     _this.closeTransactionModal();
                 }).catch(function (error) {
                     console.log(error)
@@ -140,6 +175,13 @@ new Vue({
             } else {
                 this.clientInfoByClientId = [];
             }
+        },
+
+        sortTransactionByColumnAscDesc: function (sortColumn) {
+            if (sortColumn === this.currentSortColumn) {
+                this.currentSortDirection = this.currentSortDirection === 'asc' ? 'desc' : 'asc';
+            }
+            this.currentSortColumn = sortColumn;
         }
     },
 
